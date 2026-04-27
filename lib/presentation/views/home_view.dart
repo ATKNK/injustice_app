@@ -195,8 +195,10 @@ class _HomeViewState extends State<HomeView> {
             Center(
               child: FilledButton.icon(
                 onPressed: () {
-                  final account = _vmAccount.accountState.state.value!;
-                  context.goNamed(AppRouteNames.characters, extra: account);
+                  final account = _vmAccount.accountState.state.value;
+                  if (account != null) {
+                    context.goNamed(AppRouteNames.characters, extra: account);
+                  }
                 },
                 // onPressed: () => context.push(AppRoutes.personagens),
                 icon: const Icon(Icons.people),

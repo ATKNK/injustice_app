@@ -45,7 +45,11 @@ class AppRouter {
         path: AppPaths.characters,
         name: AppRouteNames.characters,
         pageBuilder: (context, state) {
-          final account = state.extra as Account;
+          final account = state.extra as Account?;
+          if (account == null) {
+            // If no account is provided, redirect to home
+            return const NoTransitionPage(child: HomeView());
+          }
           return NoTransitionPage(child: CharactersView(account: account));
         },
       ),
