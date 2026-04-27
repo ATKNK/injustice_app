@@ -10,6 +10,7 @@ import '../../../../widgets/empty_state.dart';
 import '../../../../widgets/loading_indicator.dart';
 import '../../../../widgets/star_rating.dart';
 import 'package:signals_flutter/signals_flutter.dart';
+import 'character_edit_modal.dart';
 
 class CharactersBody extends StatelessWidget {
   final CharactersViewModel viewModel;
@@ -20,6 +21,20 @@ class CharactersBody extends StatelessWidget {
     required this.viewModel,
     required this.account,
   });
+
+  void _showEditModal(
+    BuildContext context,
+    Character character,
+    CharactersViewModel viewModel,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return CharacterEditModal(character: character, viewModel: viewModel);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +80,8 @@ class CharactersBody extends StatelessWidget {
                       character: character,
                       onDelete: () {},
                       onTap: () {},
+                      onEdit: () =>
+                          _showEditModal(context, character, viewModel),
                     );
                   }, childCount: characters.length),
                 ),
@@ -122,12 +139,14 @@ class CharacterListItem extends StatelessWidget {
   final Character character;
   final VoidCallback onDelete;
   final VoidCallback onTap;
+  final VoidCallback onEdit;
 
   const CharacterListItem({
     super.key,
     required this.character,
     required this.onDelete,
     required this.onTap,
+    required this.onEdit,
   });
 
   @override
@@ -156,7 +175,7 @@ class CharacterListItem extends StatelessWidget {
       ),
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
-          onTap();
+          onEdit();
           return false;
         } else {
           return await showDialog<bool>(

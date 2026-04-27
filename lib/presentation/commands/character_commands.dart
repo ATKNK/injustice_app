@@ -7,7 +7,6 @@ import '../../domain/models/character_entity.dart';
 
 final class CreateCharacterCommand
     extends ParameterizedCommand<Character, Failure, CharacterParams> {
-  
   final ICharacterFacadeUseCases _characterFacadeUseCases;
 
   CreateCharacterCommand(this._characterFacadeUseCases);
@@ -24,7 +23,6 @@ final class CreateCharacterCommand
 
 final class DeleteCharacterCommand
     extends ParameterizedCommand<Character, Failure, CharacterIdParams> {
-  
   final ICharacterFacadeUseCases _characterFacadeUseCases;
 
   DeleteCharacterCommand(this._characterFacadeUseCases);
@@ -41,7 +39,6 @@ final class DeleteCharacterCommand
 
 final class GetAllCharactersCommand
     extends ParameterizedCommand<List<Character>, Failure, NoParams> {
-  
   final ICharacterFacadeUseCases _characterFacadeUseCases;
 
   GetAllCharactersCommand(this._characterFacadeUseCases);
@@ -54,7 +51,6 @@ final class GetAllCharactersCommand
 
 final class GetCharacterByIdCommand
     extends ParameterizedCommand<Character, Failure, CharacterIdParams> {
-  
   final ICharacterFacadeUseCases _characterFacadeUseCases;
 
   GetCharacterByIdCommand(this._characterFacadeUseCases);
@@ -62,7 +58,9 @@ final class GetCharacterByIdCommand
   @override
   Future<CharacterResult> execute() async {
     if (parameter == null || parameter!.id.isEmpty) {
-      return Error(InputFailure('Parametro nulo para obter personagem por ID.'));
+      return Error(
+        InputFailure('Parametro nulo para obter personagem por ID.'),
+      );
     }
 
     return await _characterFacadeUseCases.getCharacterById(parameter!);
