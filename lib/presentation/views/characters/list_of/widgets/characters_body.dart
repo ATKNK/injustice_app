@@ -11,6 +11,7 @@ import '../../../../widgets/loading_indicator.dart';
 import '../../../../widgets/star_rating.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import 'character_edit_modal.dart';
+import 'character_show_modal.dart';
 
 class CharactersBody extends StatelessWidget {
   final CharactersViewModel viewModel;
@@ -21,6 +22,20 @@ class CharactersBody extends StatelessWidget {
     required this.viewModel,
     required this.account,
   });
+
+  void _showModal(
+    BuildContext context,
+    Character character,
+    CharactersViewModel viewModel,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return CharacterShowModal(character: character, viewModel: viewModel);
+      },
+    );
+  }
 
   void _showEditModal(
     BuildContext context,
@@ -78,8 +93,16 @@ class CharactersBody extends StatelessWidget {
                     final character = characters[index];
                     return CharacterListItem(
                       character: character,
-                      onDelete: () {},
+
+                      onDelete: () async {
+                        await viewModel.commands.deleteCharacter(character.id);
+                      },
+
                       onTap: () {},
+
+                      onDoubleTap: () =>
+                          _showModal(context, character, viewModel),
+
                       onEdit: () =>
                           _showEditModal(context, character, viewModel),
                     );
@@ -139,6 +162,7 @@ class CharacterListItem extends StatelessWidget {
   final Character character;
   final VoidCallback onDelete;
   final VoidCallback onTap;
+  final VoidCallback onDoubleTap;
   final VoidCallback onEdit;
 
   const CharacterListItem({
@@ -146,6 +170,7 @@ class CharacterListItem extends StatelessWidget {
     required this.character,
     required this.onDelete,
     required this.onTap,
+    required this.onDoubleTap,
     required this.onEdit,
   });
 
@@ -208,6 +233,7 @@ class CharacterListItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         child: InkWell(
           onTap: onTap,
+          onDoubleTap: onDoubleTap,
           borderRadius: BorderRadius.circular(AppRadius.md),
           child: Padding(
             padding: AppSpacing.paddingMd,

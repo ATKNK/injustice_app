@@ -89,11 +89,10 @@ class _CharacterEditModalState extends State<CharacterEditModal> {
         updatedAt: DateTime.now(),
       );
 
-      // Set the parameter as a record and execute the command
-      widget.viewModel.commands.createCharacterCommand.parameter = (
+      widget.viewModel.commands.updateCharacterCommand.parameter = (
         character: updatedCharacter,
       );
-      await widget.viewModel.commands.createCharacterCommand.execute();
+      await widget.viewModel.commands.updateCharacterCommand.execute();
 
       if (mounted) {
         Navigator.pop(context);
@@ -167,7 +166,6 @@ class _CharacterEditModalState extends State<CharacterEditModal> {
               ),
               const SizedBox(height: AppSpacing.md),
 
-              // Class and Rarity Row
               Row(
                 children: [
                   Expanded(

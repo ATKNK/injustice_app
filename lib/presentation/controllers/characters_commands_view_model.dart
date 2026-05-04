@@ -9,16 +9,24 @@ class CharactersCommandsViewModel {
   final CharactersStateViewmodel state;
   final GetAllCharactersCommand _getAccountCommand;
   final CreateCharacterCommand _createCharacterCommand;
+  final UpdateCharacterCommand _updateCharacterCommand;
+  final DeleteCharacterCommand _deleteCharacterCommand;
 
   CharactersCommandsViewModel({
     required this.state,
     required GetAllCharactersCommand getAccountCommand,
     required CreateCharacterCommand createCharacterCommand,
+    required UpdateCharacterCommand updateCharacterCommand,
+    required DeleteCharacterCommand deleteCharacterCommand,
   }) : _getAccountCommand = getAccountCommand,
-       _createCharacterCommand = createCharacterCommand {
+       _createCharacterCommand = createCharacterCommand,
+       _updateCharacterCommand = updateCharacterCommand,
+       _deleteCharacterCommand = deleteCharacterCommand {
     // Observers para cada comando
     _observeGetAllCharacters();
     _observeCreateCharacter();
+    _observeUpdateCharacter();
+    _observeDeleteCharacter();
   }
 
   // ========================================================
@@ -26,6 +34,8 @@ class CharactersCommandsViewModel {
   // ========================================================
   GetAllCharactersCommand get getAllCharactersCommand => _getAccountCommand;
   CreateCharacterCommand get createCharacterCommand => _createCharacterCommand;
+  UpdateCharacterCommand get updateCharacterCommand => _updateCharacterCommand;
+  DeleteCharacterCommand get deleteCharacterCommand => _deleteCharacterCommand;
 
   // ========================================================
   //   MÉTODO GENÉRICO DE OBSERVAÇÃO DE COMANDOS
@@ -75,17 +85,51 @@ class CharactersCommandsViewModel {
           state.setMessage(err.msg), // registra o erro no estado
     );
   }
+
   /// Criar um novo personagem
-  void _observeCreateCharacter() {  
+  void _observeCreateCharacter() {
     _observeCommand<Character>(
       _createCharacterCommand,
       onSuccess: (newCharacter) {
         final currentList = state.state.value;
-        final newlist = [...currentList, newCharacter]; // Adiciona o novo personagem à lista
-        state.state.value = newlist; 
+        final newlist = [
+          ...currentList,
+          newCharacter,
+        ]; // Adiciona o novo personagem à lista
+        state.state.value = newlist;
       },
       onFailure: (err) =>
           state.setMessage(err.msg), // registra o erro no estado
+    );
+  }
+
+  void _observeUpdateCharacter() {
+    _observeCommand<Character>(
+      _updateCharacterCommand,
+      onSuccess: (updatedCharacter) {
+        final currentList = state.state.value;
+        final newlist = currentList.map((character) {
+          return character.id == updatedCharacter.id
+              ? updatedCharacter
+              : character;
+        }).toList();
+        state.state.value = newlist;
+      },
+      onFailure: (err) => state.setMessage(err.msg),
+    );
+  }
+
+  void _observeDeleteCharacter() {
+    _observeCommand<Character>(
+      _deleteCharacterCommand,
+      onSuccess: (deletedCharacter) {
+        final currentList = state.state.value;
+        final newList = currentList.map((character) {
+          return character.id == deletedCharacter.id ? null : character;
+        }).toList();
+        state.state.value = newList.whereType<Character>().toList();
+      },
+      onFailure: (err) => state.setMessage(err.msg),
     );
   }
 
@@ -103,5 +147,16 @@ class CharactersCommandsViewModel {
   Future<void> addCharacter(Character character) async {
     state.clearMessage(); // Limpa mensagens anteriores
     await _createCharacterCommand.executeWith((character: character));
+  }
+
+  /// atualiza personagem existente e atualiza o estado
+  Future<void> updateCharacter(Character character) async {
+    state.clearMessage();
+    await _updateCharacterCommand.executeWith((character: character));
+  }
+
+  Future<void> deleteCharacter(String id) async {
+    state.clearMessage();
+    await _deleteCharacterCommand.executeWith((id: id));
   }
 }
